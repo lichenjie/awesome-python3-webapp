@@ -113,10 +113,10 @@ class ModelMetaclass(type):
       raise StandardError("Primary key not found")
     for k in mappings.keys():
       attrs.pop(k)
-    escaped_fields = list(map(lambda f: '`%s`' %f, filelds))
+    escaped_fields = list(map(lambda f: '`%s`' %f, fields))
     attrs['__mappings__'] = mappings
     attrs['__table__'] = tableName
     attrs['__primary_key__'] = primaryKey
     attrs['__fields__'] = fields #除主键外的属性名
     attrs['__select__'] = "select `%s`, %s from `%s`" % (primaryKey, ', '.join(escaped_fields), tableName)
-    attrs['__insert__'] = "insert into `%s` (%s, `%s`) values (%s) % values(%s)"  %(tableName, ', '.join(map(lambada f: '')))
+    attrs['__insert__'] = "insert into `%s` (%s, `%s`) values (%s) % values(%s)"  %(tableName, ', '.join(map(lambada f: '`%s`' %f, fields), primaryKey, ))

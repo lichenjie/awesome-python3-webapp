@@ -5,7 +5,7 @@ import urllib
 import SocketServer
 import threading
 import ssl
-
+import json
 HOST_NAME = '0.0.0.0' 
 PORT_NUMBER = 8200
 
@@ -32,7 +32,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         if 'POST' in self.command:
           self.do_HEAD()
           data = self.rfile.read()
-          self.wfile.write("hi")
+          
           return
 class ThreadedHTTPServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
     pass

@@ -1,0 +1,49 @@
+
+import BaseHTTPServer
+import urlparse
+import urllib 
+import SocketServer
+import threading
+import ssl
+
+HOST_NAME = '0.0.0.0' 
+PORT_NUMBER = 8200
+
+
+class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
+    def do_HEAD(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+
+    def do_GET(self):
+        print self.path, self.command
+        if 'get'in self.path or 'GET' in self.command:
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write('On /get/')
+            return
+        self.wfile.write('On root')
+        return    
+
+    def do_POST(self):
+        print self.path, self.command
+        if 'POST' in self.command:
+          self.do_HEAD()
+          data = self.rfile.read()
+          self.wfile.write("hi")
+          return
+class ThreadedHTTPServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
+    pass
+
+
+if __name__ == '__main__':
+    httpd = BaseHTTPServer.HTTPServer((HOST_NAME, PORT_NUMBER), Handler)
+    httpd.socket = ssl.wrap_socket (httpd.socket, keyfile='key.pem', certfile='cert.pem', server_side=True)
+    try:
+        print "Server Start - %s:%s" % (HOST_NAME, PORT_NUMBER)
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        httpd.server_close()
+    print "Server Stopped - %s:%s" % (HOST_NAME, PORT_NUMBER)

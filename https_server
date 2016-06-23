@@ -1,6 +1,7 @@
-
+from sys import version as python_version
+from cgi import parse_header, parse_multipart
 import BaseHTTPServer
-import urlparse
+from urlparse import parse_qs
 import urllib 
 import SocketServer
 import threading
@@ -31,9 +32,17 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         print self.path, self.command
         if 'POST' in self.command:
           self.do_HEAD()
-          data = self.rfile.read()
-          
-          return
+          ctype, pdict = parse_header(self.headers['content-type'])
+          if ctype == 'multipart/form-data':
+            postvars = parse_mulipart(self.rfile, pdict)
+          elif ctype ==  'application/x-www-form-urlencoded':
+            len = int(self.headers['content-length'])
+            postvars = parse_qs(self.rfile.read(len), keep_blank_values=1)
+          else:
+            pstvars = {}
+          print type(postvars), json.loads(type(postvars['data'][0]))
+          return postvars
+      
 class ThreadedHTTPServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
     pass
 
